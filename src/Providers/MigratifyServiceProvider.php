@@ -4,6 +4,7 @@
 namespace AlexVanVliet\Migratify\Providers;
 
 use AlexVanVliet\Migratify\Console\Commands\CreateCommand;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
 class MigratifyServiceProvider extends ServiceProvider
@@ -15,7 +16,7 @@ class MigratifyServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(CreateCommand::class, fn(Application $app) => new CreateCommand($app->make('migrator')));
     }
 
     /**

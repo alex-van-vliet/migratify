@@ -2,6 +2,7 @@
 
 namespace AlexVanVliet\Migratify\Console\Commands;
 
+use AlexVanVliet\Migratify\Database\BlueprintMock;
 use AlexVanVliet\Migratify\Database\DatabaseManagerMock;
 use AlexVanVliet\Migratify\Model;
 use AlexVanVliet\Migratify\ModelNotFoundException;
@@ -34,7 +35,7 @@ class CreateCommand extends Command
      * @return void
      */
     public function __construct(
-        protected Migrator $migrator
+        protected Migrator $migrator,
     )
     {
         parent::__construct();
@@ -84,18 +85,22 @@ class CreateCommand extends Command
      *
      * @return int
      */
-    public function handle(Application $application)
+    public function handle(Application $application, MigrationCreator $creator)
     {
         $state = $this->getState($application);
-        var_dump($state);
         $models = config('migratify.models');
         foreach ($models as $model) {
             $reflectionClass = new ReflectionClass($model);
             $attribute = $this->getModelAttribute($reflectionClass);
+            $table = (new $model())->getTable();
             $this->info("Attribute found for '$model'.");
             foreach ($attribute->getFields() as $name => $type) {
                 $typename = get_class($type);
                 $this->line("\tField '$name' has type '$typename'.");
+            }
+            $stateForModel = $state[$table] ?? null;
+            if ($stateForModel === null) {
+                $creator->createMigration($table, $attribute);
             }
         }
         return 0;

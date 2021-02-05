@@ -4,6 +4,7 @@
 namespace AlexVanVliet\Migratify\Fields;
 
 
-class Field
+abstract class Field
 {
+    abstract public function create(string $name): string;
 }

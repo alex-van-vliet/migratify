@@ -80,6 +80,38 @@ class CreateCommand extends Command
         return $mockedDatabaseManager->connection()->getSchemaBuilder()->getBlueprints();
     }
 
+    public function getDiff(BlueprintMock $current, BlueprintMock $expected)
+    {
+        $additions = [];
+        $updates = [];
+        foreach ($expected->getFields() as $name => $field) {
+            if (array_key_exists($name, $current->getFields())) {
+                if (!$field->equals($current->getFields()[$name])) {
+                    $updates[$name] = [$current->getFields()[$name], $field];
+                }
+            } else {
+                $additions[$name] = $field;
+            }
+        }
+
+        $removals = [];
+        foreach ($current->getFields() as $name => $field) {
+            if (!array_key_exists($name, $expected->getFields())) {
+                $removals[$name] = $field;
+            }
+        }
+
+        if (count($updates) != 0 or count($removals) != 0) {
+            $this->warn("Update migration detected, down currently not supported for updates and removals.");
+        }
+
+        return [
+            'additions' => $additions,
+            'removals' => $removals,
+            'updates' => $updates,
+        ];
+    }
+
     /**
      * Execute the console command.
      *
@@ -100,7 +132,13 @@ class CreateCommand extends Command
             }
             $stateForModel = $state[$table] ?? null;
             if ($stateForModel === null) {
-                $creator->createMigration($table, $attribute);
+                $creator->createMigration($table, $attribute->toBlueprint($table)->getFields());
+            } else {
+                $diff = $this->getDiff($stateForModel, $attribute->toBlueprint($table));
+                if (empty($diff['additions']) and empty($diff['removals']) and empty($diff['updates'])) {
+                } else {
+                    $creator->updateMigration($table, ...$diff);
+                }
             }
         }
         return 0;

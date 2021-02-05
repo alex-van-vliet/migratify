@@ -61,7 +61,11 @@ class CreateCommand extends Command
         foreach ($models as $model) {
             $reflectionClass = new ReflectionClass($model);
             $attribute = $this->getModelAttribute($reflectionClass);
-            $this->info("Attribute found for $model.");
+            $this->info("Attribute found for '$model'.");
+            foreach ($attribute->getFields() as $name => $type) {
+                $typename = get_class($type);
+                $this->line("\tField '$name' has type '$typename'.");
+            }
         }
         return 0;
     }

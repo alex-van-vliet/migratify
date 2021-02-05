@@ -1,0 +1,12 @@
+{
+    "name": "alexvanvliet/migratify",
+    "description": "Laravel migrations creator from attributes",
+    "authors": [
+        {
+            "name": "Alex van Vliet",
+            "email": "alex@vanvliet.pro"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}

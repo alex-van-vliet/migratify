@@ -11,9 +11,18 @@ class Field extends Fluent
 {
     public const STRING = 'string';
 
-    public function __construct(protected string $type, array $attributes = [])
+    public function __construct(
+        protected string $type,
+        array $attributes = [],
+        protected array $options = [],
+    )
     {
         parent::__construct($attributes);
+    }
+
+    public function getOptions()
+    {
+        return $this->options;
     }
 
     public function getType()

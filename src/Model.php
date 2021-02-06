@@ -16,7 +16,7 @@ class Model
     )
     {
         foreach ($this->fields as $k => $field) {
-            assert(count($field) == 1 or count($field) == 2);
+            assert(count($field) === 1 or count($field) === 2 or count($field) === 3);
             $this->fields[$k] = new Field(...$field);
         }
     }

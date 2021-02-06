@@ -17,10 +17,7 @@ class Model
     {
         foreach ($this->fields as $k => $field) {
             assert(count($field) == 1 or count($field) == 2);
-            if (count($field) == 1)
-                $this->fields[$k] = new Field($field[0]);
-            else
-                $this->fields[$k] = new Field($field[0], $field[1]);
+            $this->fields[$k] = new Field(...$field);
         }
     }
 

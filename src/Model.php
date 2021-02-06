@@ -55,4 +55,18 @@ class Model
 
         return $blueprint;
     }
+
+    public function getFillable()
+    {
+        $fillable = [];
+        $guarded = [];
+        foreach ($this->fields as $name => $field) {
+            if (in_array('guarded', $field->getOptions())) {
+                $guarded[] = $name;
+            } else {
+                $fillable[] = $name;
+            }
+        }
+        return [$fillable, $guarded];
+    }
 }

@@ -5,6 +5,7 @@ namespace AlexVanVliet\Migratify\Console\Commands;
 
 
 use Illuminate\Database\Migrations\MigrationCreator as MigrationCreatorBase;
+use InvalidArgumentException;
 
 function addOrMerge($arr, $lines)
 {
@@ -123,22 +124,31 @@ class MigrationCreator extends MigrationCreatorBase
 
     public function updateMigration(string $table, array $updates, array $additions, array $removals)
     {
-        $name = "update_${table}_table";
+        $basename = "update_${table}_table";
+        $updateNumber = 1;
         $path = database_path('migrations');
         $create = false;
 
-        $this->ensureMigrationDoesntAlreadyExist($name, $path);
+        do {
+            $exists = false;
+            try {
+                $this->ensureMigrationDoesntAlreadyExist("{$basename}_{$updateNumber}", $path);
+            } catch (InvalidArgumentException) {
+                $exists = true;
+                $updateNumber += 1;
+            }
+        } while ($exists);
 
         // First we will get the stub file for the migration, which serves as a type
         // of template for the migration. Once we have those we will populate the
         // various place-holders, save the file, and run the post create event.
         $stub = $this->getStub($table, $create);
 
-        $path = $this->getPath($name, $path);
+        $path = $this->getPath("{$basename}_{$updateNumber}", $path);
 
         $this->files->ensureDirectoryExists(dirname($path));
 
-        $stub = $this->populateStub($name, $stub, $table);
+        $stub = $this->populateStub("{$basename}_{$updateNumber}", $stub, $table);
 
         $stub = $this->populateUpdate($stub, $updates, $additions, $removals);
 

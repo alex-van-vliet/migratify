@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 class Field extends Fluent
 {
     public const STRING = 'string';
+    public const ID = 'id';
 
     public function __construct(
         protected string $type,

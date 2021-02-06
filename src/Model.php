@@ -35,7 +35,11 @@ class Model
         foreach ($this->fields as $name => $field) {
             $stored = $blueprint->{$field->getType()}($name);
             foreach ($field->getAttributes() as $key => $attribute) {
-                $stored->{$key}($attribute);
+                if (is_int($key)) {
+                    $stored->{$attribute}();
+                } else {
+                    $stored->{$key}($attribute);
+                }
             }
         }
 

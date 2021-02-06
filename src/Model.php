@@ -6,6 +6,7 @@ namespace AlexVanVliet\Migratify;
 use AlexVanVliet\Migratify\Database\BlueprintMock;
 use AlexVanVliet\Migratify\Fields\Field;
 use Attribute;
+use ReflectionClass;
 
 #[Attribute]
 class Model
@@ -21,6 +22,18 @@ class Model
             else
                 $this->fields[$k] = new Field($field[0], $field[1]);
         }
+    }
+
+    public static function from_attribute(string $model): self
+    {
+        $reflectionClass = new ReflectionClass($model);
+
+        $attributes = $reflectionClass->getAttributes(self::class);
+        if (empty($attributes))
+            throw new ModelNotFoundException($reflectionClass->getName());
+        assert(count($attributes) == 1);
+
+        return $attributes[0]->newInstance();
     }
 
     public function getFields()

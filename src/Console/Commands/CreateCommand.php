@@ -5,11 +5,9 @@ namespace AlexVanVliet\Migratify\Console\Commands;
 use AlexVanVliet\Migratify\Database\BlueprintMock;
 use AlexVanVliet\Migratify\Database\DatabaseManagerMock;
 use AlexVanVliet\Migratify\Model;
-use AlexVanVliet\Migratify\ModelNotFoundException;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Migrations\Migrator;
-use ReflectionClass;
 
 class CreateCommand extends Command
 {
@@ -39,23 +37,6 @@ class CreateCommand extends Command
     )
     {
         parent::__construct();
-    }
-
-    /**
-     * Get the model attribute.
-     * @param $reflectionClass
-     * @return Model
-     */
-    protected function getModelAttribute(ReflectionClass $reflectionClass)
-    {
-        $attributes = $reflectionClass->getAttributes();
-        foreach ($attributes as $attribute) {
-            $instance = $attribute->newInstance();
-            if ($instance instanceof Model)
-                return $instance;
-        }
-
-        throw new ModelNotFoundException($reflectionClass->getName());
     }
 
     /**
@@ -122,8 +103,7 @@ class CreateCommand extends Command
         $state = $this->getState($application);
         $models = config('migratify.models');
         foreach ($models as $model) {
-            $reflectionClass = new ReflectionClass($model);
-            $attribute = $this->getModelAttribute($reflectionClass);
+            $attribute = Model::from_attribute($model);
             $table = (new $model())->getTable();
             $this->info("Attribute found for '$model'.");
             foreach ($attribute->getFields() as $name => $type) {

@@ -37,4 +37,9 @@ class BlueprintMock extends Blueprint
     {
         return $this->fields;
     }
+
+    protected function addCommand($name, array $parameters = [])
+    {
+        throw new OperationNotSupportedException($name);
+    }
 }

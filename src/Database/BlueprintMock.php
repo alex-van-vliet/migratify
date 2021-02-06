@@ -42,4 +42,39 @@ class BlueprintMock extends Blueprint
     {
         throw new OperationNotSupportedException($name);
     }
+
+    public function computed($column, $expression)
+    {
+        throw new FieldNotSupportedException('computed');
+    }
+
+    public function morphs($name, $indexName = null)
+    {
+        throw new FieldNotSupportedException('morphs');
+    }
+
+    public function nullableMorphs($name, $indexName = null)
+    {
+        throw new FieldNotSupportedException('nullableMorphs');
+    }
+
+    public function numericMorphs($name, $indexName = null)
+    {
+        throw new FieldNotSupportedException('numericMorphs');
+    }
+
+    public function nullableNumericMorphs($name, $indexName = null)
+    {
+        throw new FieldNotSupportedException('nullableNumericMorphs');
+    }
+
+    public function uuidMorphs($name, $indexName = null)
+    {
+        throw new FieldNotSupportedException('uuidMorphs');
+    }
+
+    public function nullableUuidMorphs($name, $indexName = null)
+    {
+        throw new FieldNotSupportedException('nullableUuidMorphs');
+    }
 }

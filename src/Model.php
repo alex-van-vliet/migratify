@@ -13,11 +13,20 @@ class Model
 {
     public function __construct(
         protected array $fields,
+        protected array $options = [],
     )
     {
-        foreach ($this->fields as $k => $field) {
+        foreach ($this->fields as $name => $field) {
             assert(count($field) === 1 or count($field) === 2 or count($field) === 3);
-            $this->fields[$k] = new Field(...$field);
+            $this->fields[$name] = new Field(...$field);
+        }
+
+        if (($this->options['timestamps'] ?? true) === true) {
+            $this->fields['created_at'] = new Field(Field::TIMESTAMP, [], ['nullable']);
+            $this->fields['updated_at'] = new Field(Field::TIMESTAMP, [], ['nullable']);
+        }
+        if (($this->options['soft_deletes'] ?? false) === true) {
+            $this->fields['deleted_at'] = new Field(Field::TIMESTAMP, [], ['nullable']);
         }
     }
 

@@ -21,6 +21,8 @@ class BlueprintMock extends Blueprint
 
     public function addColumn($type, $name, array $parameters = [])
     {
+        parent::addColumn($type, $name, $parameters);
+
         $this->fields[$name] = new Field($type, $parameters);
 
         return $this->fields[$name];

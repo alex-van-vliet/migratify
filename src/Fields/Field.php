@@ -22,6 +22,10 @@ function escape_value($value) {
         throw new InvalidArgumentException("Arrays not supported.");
     }
 
+    if (is_bool($value)) {
+        return $value ? 'true' : 'false';
+    }
+
     return $value;
 }
 

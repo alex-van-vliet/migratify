@@ -8,8 +8,15 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
 use InvalidArgumentException;
 use ReflectionClass;
+use ReflectionException;
 
-function escape_value($value) {
+/**
+ * Escape a value to put it in the migration.
+ *
+ * @param $value
+ * @return string
+ */
+function escape_value($value): string {
     if (is_string($value)) {
         $value = addcslashes($value, "\\'");
         return "'$value'";
@@ -86,6 +93,13 @@ class Field extends Fluent
     public const MULTI_POLYGON = 'multiPolygon';
     public const MULTI_POLYGON_Z = 'multiPolygonZ';
 
+    /**
+     * Field constructor.
+     *
+     * @param string $type The type of the field.
+     * @param array $attributes Its attributes.
+     * @param array $options The options.
+     */
     public function __construct(
         protected string $type,
         array $attributes = [],
@@ -95,16 +109,33 @@ class Field extends Fluent
         parent::__construct($attributes);
     }
 
-    public function getOptions()
+    /**
+     * Get the options of the field.
+     *
+     * @return array
+     */
+    public function getOptions(): array
     {
         return $this->options;
     }
 
+    /**
+     * Get the type of the field.
+     *
+     * @return string
+     */
     public function getType()
     {
         return $this->type;
     }
 
+    /**
+     * Get the line which would create the field.
+     *
+     * @param string $name The name of the column.
+     * @return string
+     * @throws ReflectionException
+     */
     public function getUpLine(string $name): string
     {
         $attributes = $this->getAttributes();
@@ -144,12 +175,25 @@ class Field extends Fluent
         return $up;
     }
 
+    /**
+     * Get the line which would remove the field.
+     *
+     * @param string $name The name of the column.
+     * @return string
+     */
     public function getDownLine(string $name): string
     {
         return "\$table->removeColumn('$name')";
     }
 
-    public function create(string $name)
+    /**
+     * Get the lines to up/down the creation of the field.
+     *
+     * @param string $name The name of the column.
+     * @return string[]
+     * @throws ReflectionException
+     */
+    public function create(string $name): array
     {
         return [
             $this->getUpLine($name),
@@ -157,7 +201,13 @@ class Field extends Fluent
         ];
     }
 
-    public function remove(string $name)
+    /**
+     * Get the lines to up/down the removal of the field.
+     *
+     * @param string $name
+     * @return string[]
+     */
+    public function remove(string $name): array
     {
         return [
             $this->getDownLine($name),
@@ -165,7 +215,15 @@ class Field extends Fluent
         ];
     }
 
-    public function update(string $name, Field $from)
+    /**
+     * Get the lines to up/down the update of the field.
+     *
+     * @param string $name The name of the column.
+     * @param Field $from The initial type of the field.
+     * @return string[]
+     * @throws ReflectionException
+     */
+    public function update(string $name, Field $from): array
     {
         return [
             "{$this->getUpLine($name)}->change()",
@@ -173,6 +231,12 @@ class Field extends Fluent
         ];
     }
 
+    /**
+     * Check whether two fields are equal.
+     *
+     * @param Field $other The other field.
+     * @return bool
+     */
     public function equals(Field $other)
     {
         if ($this->type !== $other->type)
@@ -191,6 +255,9 @@ class Field extends Fluent
         return true;
     }
 
+    /**
+     * Disable the change function in the migration.
+     */
     public function change()
     {
 

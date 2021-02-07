@@ -8,8 +8,12 @@ use Exception;
 
 class FieldNotSupportedException extends Exception
 {
-    public function __construct($name)
+    /**
+     * FieldNotSupportedException constructor.
+     * @param string $type The type of the field.
+     */
+    public function __construct(string $type)
     {
-        parent::__construct("Field type $name not supported");
+        parent::__construct("Field type $type not supported");
     }
 }

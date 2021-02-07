@@ -4,8 +4,17 @@
 namespace AlexVanVliet\Migratify;
 
 
+use ReflectionException;
+
 trait ModelTrait
 {
+    /**
+     * Initialize the model.
+     *
+     * @throws InvalidBaseConfigurationException
+     * @throws ModelNotFoundException
+     * @throws ReflectionException
+     */
     public function initializeModelTrait()
     {
         $trait = Model::from_attribute(static::class);

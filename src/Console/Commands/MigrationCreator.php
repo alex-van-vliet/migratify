@@ -4,10 +4,18 @@
 namespace AlexVanVliet\Migratify\Console\Commands;
 
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Migrations\MigrationCreator as MigrationCreatorBase;
 use InvalidArgumentException;
 
-function addOrMerge($arr, $lines)
+/**
+ * Add or merge an array with lines.
+ *
+ * @param array $arr The array
+ * @param string|array $lines Either one line as a string or several lines as an array
+ * @return array
+ */
+function addOrMerge(array $arr, string|array $lines): array
 {
     if (is_array($lines))
         return $arr + $lines;
@@ -17,11 +25,24 @@ function addOrMerge($arr, $lines)
 
 class MigrationCreator extends MigrationCreatorBase
 {
+    /**
+     * Get the path to the stubs.
+     *
+     * @return string
+     */
     public function stubPath()
     {
         return __DIR__ . '/stubs';
     }
 
+    /**
+     * Get the stub for a given table.
+     *
+     * @param string|null $table The name of the table.
+     * @param bool $create Whether it is a create or an update stub.
+     * @return string
+     * @throws FileNotFoundException
+     */
     protected function getStub($table, $create)
     {
         if ($create) {
@@ -37,7 +58,14 @@ class MigrationCreator extends MigrationCreatorBase
         return $this->files->get($stub);
     }
 
-    protected function populateCreate(string $stub, array $fields)
+    /**
+     * Populate the up in the create stub.
+     *
+     * @param string $stub The stub.
+     * @param array $fields The fields to add.
+     * @return string
+     */
+    protected function populateCreate(string $stub, array $fields): string
     {
         $up = [];
         foreach ($fields as $name => $field) {
@@ -54,7 +82,15 @@ class MigrationCreator extends MigrationCreatorBase
         return $stub;
     }
 
-    public function createMigration(string $table, array $fields)
+    /**
+     * Create a create migration.
+     *
+     * @param string $table The name of the table
+     * @param array $fields The fields to add.
+     * @return string The path to the migration.
+     * @throws FileNotFoundException
+     */
+    public function createMigration(string $table, array $fields): string
     {
         $name = "create_${table}_table";
         $path = database_path('migrations');
@@ -85,8 +121,16 @@ class MigrationCreator extends MigrationCreatorBase
         return $path;
     }
 
-
-    protected function populateUpdate(string $stub, array $updates, array $additions, array $removals)
+    /**
+     * Populate the up and down in the update stub.
+     *
+     * @param string $stub The stub.
+     * @param array $updates The fields to update.
+     * @param array $additions The fields to add.
+     * @param array $removals The fields to remove.
+     * @return string
+     */
+    protected function populateUpdate(string $stub, array $updates, array $additions, array $removals): string
     {
         $up = [];
         $down = [];
@@ -122,7 +166,17 @@ class MigrationCreator extends MigrationCreatorBase
         return $stub;
     }
 
-    public function updateMigration(string $table, array $updates, array $additions, array $removals)
+    /**
+     * Create an update migration.
+     *
+     * @param string $table The name of the table
+     * @param array $updates The fields to update.
+     * @param array $additions The fields to add.
+     * @param array $removals The fields to remove.
+     * @return string The path to the migration.
+     * @throws FileNotFoundException
+     */
+    public function updateMigration(string $table, array $updates, array $additions, array $removals): string
     {
         $basename = "update_${table}_table";
         $updateNumber = 1;

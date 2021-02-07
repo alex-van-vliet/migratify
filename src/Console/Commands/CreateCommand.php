@@ -4,8 +4,12 @@ namespace AlexVanVliet\Migratify\Console\Commands;
 
 use AlexVanVliet\Migratify\Database\BlueprintMock;
 use AlexVanVliet\Migratify\Database\DatabaseManagerMock;
+use AlexVanVliet\Migratify\Fields\Field;
 use AlexVanVliet\Migratify\Model;
+use AlexVanVliet\Migratify\ModelNotFoundException;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Migrations\Migrator;
 
@@ -41,8 +45,11 @@ class CreateCommand extends Command
 
     /**
      * Get the state of the database.
+     *
+     * @return BlueprintMock[]
+     * @throws BindingResolutionException
      */
-    protected function getState(Application $application)
+    protected function getState(Application $application): array
     {
         $db = $application->make('db');
 
@@ -61,7 +68,14 @@ class CreateCommand extends Command
         return $mockedDatabaseManager->connection()->getSchemaBuilder()->getBlueprints();
     }
 
-    public function getDiff(BlueprintMock $current, BlueprintMock $expected)
+    /**
+     * Get the difference between two blueprints.
+     *
+     * @param BlueprintMock $current The blueprint found in the migrations.
+     * @param BlueprintMock $expected The blueprint wanted in the model.
+     * @return Field[][] The added, removed and changed fields.
+     */
+    public function getDiff(BlueprintMock $current, BlueprintMock $expected): array
     {
         $additions = [];
         $updates = [];
@@ -96,9 +110,14 @@ class CreateCommand extends Command
     /**
      * Execute the console command.
      *
+     * @param Application $application The application.
+     * @param MigrationCreator $creator The migration creator.
      * @return int
+     * @throws ModelNotFoundException
+     * @throws BindingResolutionException
+     * @throws FileNotFoundException
      */
-    public function handle(Application $application, MigrationCreator $creator)
+    public function handle(Application $application, MigrationCreator $creator): int
     {
         $state = $this->getState($application);
         $models = config('migratify.models');

@@ -7,10 +7,17 @@ use AlexVanVliet\Migratify\Database\BlueprintMock;
 use AlexVanVliet\Migratify\Fields\Field;
 use Attribute;
 use ReflectionClass;
+use ReflectionException;
 
 #[Attribute]
 class Model
 {
+    /**
+     * Model constructor.
+     *
+     * @param array $fields The fields of the model.
+     * @param array $options The options.
+     */
     public function __construct(
         protected array $fields,
         protected array $options = [],
@@ -30,6 +37,14 @@ class Model
         }
     }
 
+    /**
+     * Get the model from the attribute.
+     *
+     * @param string $model The model class.
+     * @return static
+     * @throws ModelNotFoundException
+     * @throws ReflectionException
+     */
     public static function from_attribute(string $model): self
     {
         $reflectionClass = new ReflectionClass($model);
@@ -42,12 +57,23 @@ class Model
         return $attributes[0]->newInstance();
     }
 
-    public function getFields()
+    /**
+     * Get all the fields.
+     *
+     * @return Field[]
+     */
+    public function getFields(): array
     {
         return $this->fields;
     }
 
-    public function toBlueprint(string $table)
+    /**
+     * Convert to blueprint for comparisons.
+     *
+     * @param string $table The name of the table.
+     * @return BlueprintMock
+     */
+    public function toBlueprint(string $table): BlueprintMock
     {
         $blueprint = new BlueprintMock($table);
 
@@ -65,6 +91,11 @@ class Model
         return $blueprint;
     }
 
+    /**
+     * Get the list of fillable and guarded fields.
+     *
+     * @return string[][]
+     */
     public function getFillable()
     {
         $fillable = [];

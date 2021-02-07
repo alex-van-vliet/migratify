@@ -4,8 +4,26 @@
 namespace AlexVanVliet\Migratify\Fields;
 
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
-use Illuminate\Support\Str;
+use InvalidArgumentException;
+use ReflectionClass;
+
+function escape_value($value) {
+    if (is_string($value)) {
+        $value = addcslashes($value, "\\'");
+        return "'$value'";
+    }
+
+    if (is_object($value)) {
+        throw new InvalidArgumentException("Objects not supported.");
+    }
+    if (is_array($value)) {
+        throw new InvalidArgumentException("Arrays not supported.");
+    }
+
+    return $value;
+}
 
 class Field extends Fluent
 {
@@ -83,27 +101,32 @@ class Field extends Fluent
         return $this->type;
     }
 
-    public function upString(string $name)
+    public function getUpLine(string $name): string
     {
         $attributes = $this->getAttributes();
-        if (array_key_exists('length', $attributes)) {
-            $length = $attributes['length'];
-            unset($attributes['length']);
-            return ["\$table->string('$name', $length)", $attributes];
-        } else {
-            return ["\$table->string('$name')", $attributes];
-        }
-    }
 
-    public function create(string $name)
-    {
-        $type = Str::ucfirst(Str::camel($this->type));
-        if (method_exists($this, "up$type")) {
-            [$up, $attributes] = $this->{"up$type"}($name);
-        } else {
-            $up = "\$table->{$this->type}('$name')";
-            $attributes = $this->getAttributes();
+        // Get the parameters of the function
+        $reflection = new ReflectionClass(Blueprint::class);
+        $method = $reflection->getMethod($this->type);
+        $parameters = $method->getParameters();
+        assert(count($parameters) > 0);
+        assert($parameters[0]->getName() === 'column');
+        array_shift($parameters);
+
+        // Set the parameters of the function
+        $up = "\$table->{$this->type}('$name'";
+        foreach ($parameters as $parameter) {
+            if (array_key_exists($parameter->getName(), $attributes)) {
+                $value = escape_value($attributes[$parameter->getName()]);
+                unset($attributes[$parameter->getName()]);
+            } else {
+                $value = escape_value($parameter->getDefaultValue());
+            }
+            $up = "$up, {$value}";
         }
+        $up = "$up)";
+
+        // Set other attributes (nullable, ...)
         foreach ($attributes as $k => $v) {
             if ($v === true) {
                 $up = "{$up}->{$k}()";
@@ -114,16 +137,26 @@ class Field extends Fluent
                 $up = "{$up}->{$k}($v)";
             }
         }
+        return $up;
+    }
+
+    public function getDownLine(string $name): string
+    {
+        return "\$table->removeColumn('$name')";
+    }
+
+    public function create(string $name)
+    {
         return [
-            $up,
-            "\$table->removeColumn('$name')",
+            $this->getUpLine($name),
+            $this->getDownLine($name),
         ];
     }
 
     public function remove(string $name)
     {
         return [
-            "\$table->removeColumn('$name')",
+            $this->getDownLine($name),
             "throw new \Exception('FIXME: add down for removal of column $name')",
         ];
     }
@@ -131,7 +164,7 @@ class Field extends Fluent
     public function update(string $name, Field $from)
     {
         return [
-            "{$this->create($name)[0]}->change()",
+            "{$this->getUpLine($name)}->change()",
             "throw new \Exception('FIXME: add down for update of column $name')",
         ];
     }

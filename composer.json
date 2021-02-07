@@ -7,9 +7,22 @@
             "email": "alex@vanvliet.pro"
         }
     ],
+    "type": "library",
     "minimum-stability": "dev",
     "license": "MIT",
     "require": {
         "php": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "AlexVanVliet\\Migratify\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AlexVanVliet\\Migratify\\Providers\\MigratifyServiceProvider"
+            ]
+        }
     }
 }

@@ -163,12 +163,10 @@ class Field extends Fluent
 
         // Set other attributes (nullable, ...)
         foreach ($attributes as $k => $v) {
-            if ($v === true) {
-                $up = "{$up}->{$k}()";
-            } else if (is_string($v)) {
-                $v = addcslashes($v, "\\'");
-                $up = "{$up}->{$k}('$v')";
+            if (is_int($k)) {
+                $up = "{$up}->{$v}()";
             } else {
+                $v = escape_value($v);
                 $up = "{$up}->{$k}($v)";
             }
         }

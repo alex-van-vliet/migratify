@@ -11,7 +11,7 @@ use AlexVanVliet\Migratify\Tests\TestCase;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 
 #[Model([])]
-class FakeModel extends BaseModel
+class ModelTest_FakeModel extends BaseModel
 {
 }
 
@@ -75,7 +75,7 @@ class ModelTest extends TestCase
     /** @test */
     function the_model_can_be_retrieved_from_an_attribute()
     {
-        $model = Model::from_attribute(FakeModel::class);
+        $model = Model::from_attribute(ModelTest_FakeModel::class);
 
         $this->assertEquals(new Model([]), $model);
     }

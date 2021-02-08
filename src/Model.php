@@ -6,6 +6,7 @@ namespace AlexVanVliet\Migratify;
 use AlexVanVliet\Migratify\Database\BlueprintMock;
 use AlexVanVliet\Migratify\Fields\Field;
 use Attribute;
+use Illuminate\Database\Schema\Blueprint;
 use ReflectionClass;
 use ReflectionException;
 
@@ -78,8 +79,33 @@ class Model
         $blueprint = new BlueprintMock($table);
 
         foreach ($this->fields as $name => $field) {
-            $stored = $blueprint->{$field->getType()}($name);
-            foreach ($field->getAttributes() as $key => $attribute) {
+            $attributes = $field->getAttributes();
+
+            $reflection = new ReflectionClass(Blueprint::class);
+            $method = $reflection->getMethod($field->getType());
+            $parameters = $method->getParameters();
+            assert(count($parameters) > 0);
+            assert($parameters[0]->getName() === 'column');
+            $arguments = [$name];
+            array_shift($parameters);
+
+            foreach ($parameters as $parameter) {
+                if (array_key_exists($parameter->getName(), $attributes)) {
+                    $arguments[] = $attributes[$parameter->getName()];
+                    unset($attributes[$parameter->getName()]);
+                } else if (in_array($parameter->getName(), $attributes)) {
+                    $key = array_search($parameter->getName(), $attributes);
+                    if (is_int($key)) {
+                        $arguments[] = true;
+                        unset($attributes[$key]);
+                    }
+                } else {
+                    $arguments[] = $parameter->getDefaultValue();
+                }
+            }
+
+            $stored = $method->invokeArgs($blueprint, $arguments);
+            foreach ($attributes as $key => $attribute) {
                 if (is_int($key)) {
                     $stored->{$attribute}();
                 } else {

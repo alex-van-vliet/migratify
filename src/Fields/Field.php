@@ -158,6 +158,12 @@ class Field extends Fluent
             if (array_key_exists($parameter->getName(), $attributes)) {
                 $value = escape_value($attributes[$parameter->getName()]);
                 unset($attributes[$parameter->getName()]);
+            } else if (in_array($parameter->getName(), $attributes)) {
+                $key = array_search($parameter->getName(), $attributes);
+                if (is_int($key)) {
+                    $value = escape_value(true);
+                    unset($attributes[$key]);
+                }
             } else {
                 $value = escape_value($parameter->getDefaultValue());
             }

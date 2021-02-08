@@ -240,7 +240,7 @@ class Field extends Fluent
     }
 
     /**
-     * Check whether two fields are equal.
+     * Check whether two fields are of equal type.
      *
      * @param Field $other The other field.
      * @return bool

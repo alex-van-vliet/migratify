@@ -23,9 +23,9 @@ class BlueprintMock extends Blueprint
      */
     public function __construct($table, Closure $callback = null)
     {
-        parent::__construct($table, $callback);
-
         $this->fields = [];
+
+        parent::__construct($table, $callback);
     }
 
     /**

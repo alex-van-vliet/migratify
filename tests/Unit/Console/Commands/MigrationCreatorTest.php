@@ -1,6 +1,6 @@
 <?php
 
-namespace AlexVanVliet\Migratify\Tests\Unit;
+namespace AlexVanVliet\Migratify\Tests\Unit\Console\Commands;
 
 use AlexVanVliet\Migratify\Console\Commands\MigrationCreator;
 use AlexVanVliet\Migratify\Fields\Field;

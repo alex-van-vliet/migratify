@@ -29,6 +29,15 @@ class ModelTest extends TestCase
     }
 
     /** @test */
+    function id_option_creates_an_id_field()
+    {
+        $model = new Model([]);
+
+        $this->assertArrayHasKey('id', $model->getFields());
+        $this->assertEquals(new Field(Field::ID, [], ['guarded']), $model->getFields()['id']);
+    }
+
+    /** @test */
     function timestamps_option_creates_a_created_at_field()
     {
         $model = new Model([]);
@@ -83,7 +92,7 @@ class ModelTest extends TestCase
     /** @test */
     function the_model_can_be_converted_to_a_mock_blueprint()
     {
-        $model = new Model(['id' => [Field::ID], 'column' => [Field::STRING, ['length' => 128, 'nullable']]], ['timestamps' => false]);
+        $model = new Model(['id' => [Field::ID], 'column' => [Field::STRING, ['length' => 128, 'nullable']]], ['timestamps' => false, 'id' => false]);
 
         $expected = new BlueprintMock('table', function ($table) {
             $table->id('id');
@@ -96,7 +105,7 @@ class ModelTest extends TestCase
     /** @test */
     function the_fillable_fills_can_be_retrieved()
     {
-        $model = new Model(['fillable' => [Field::TEXT], 'guarded' => [Field::TEXT, [], ['guarded']]], ['timestamps' => false]);
+        $model = new Model(['fillable' => [Field::TEXT], 'guarded' => [Field::TEXT, [], ['guarded']]], ['timestamps' => false, 'id' => false]);
 
         $this->assertEquals([['fillable'], ['guarded']], $model->getFillable());
     }

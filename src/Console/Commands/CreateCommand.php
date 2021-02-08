@@ -49,7 +49,7 @@ class CreateCommand extends Command
      * @return BlueprintMock[]
      * @throws BindingResolutionException
      */
-    protected function getState(Application $application): array
+    public function getState(Application $application): array
     {
         $db = $application->make('db');
 
@@ -96,10 +96,6 @@ class CreateCommand extends Command
             }
         }
 
-        if (count($updates) != 0 or count($removals) != 0) {
-            $this->warn("Update migration detected, down currently not supported for updates and removals.");
-        }
-
         return [
             'additions' => $additions,
             'removals' => $removals,
@@ -134,8 +130,10 @@ class CreateCommand extends Command
                 $creator->createMigration($table, $attribute->toBlueprint($table)->getFields());
             } else {
                 $diff = $this->getDiff($stateForModel, $attribute->toBlueprint($table));
-                if (empty($diff['additions']) and empty($diff['removals']) and empty($diff['updates'])) {
-                } else {
+                if (!empty($diff['additions']) or !empty($diff['removals']) or !empty($diff['updates'])) {
+                    if (!empty($diff['updates']) or !empty($diff['removals'])) {
+                        $this->warn("Update migration detected, down currently not supported for updates and removals.");
+                    }
                     $creator->updateMigration($table, ...$diff);
                 }
             }

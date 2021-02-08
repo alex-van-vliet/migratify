@@ -33,7 +33,11 @@ function escape_value($value): string {
         return $value ? 'true' : 'false';
     }
 
-    return $value;
+    if (is_null($value)) {
+        return 'null';
+    }
+
+    return strval($value);
 }
 
 class Field extends Fluent

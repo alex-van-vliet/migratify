@@ -29,11 +29,11 @@ class Model
         }
 
         if (($this->options['timestamps'] ?? true) === true) {
-            $this->fields['created_at'] = new Field(Field::TIMESTAMP, [], ['nullable']);
-            $this->fields['updated_at'] = new Field(Field::TIMESTAMP, [], ['nullable']);
+            $this->fields['created_at'] = new Field(Field::TIMESTAMP, ['nullable'], []);
+            $this->fields['updated_at'] = new Field(Field::TIMESTAMP, ['nullable'], []);
         }
         if (($this->options['soft_deletes'] ?? false) === true) {
-            $this->fields['deleted_at'] = new Field(Field::TIMESTAMP, [], ['nullable']);
+            $this->fields['deleted_at'] = new Field(Field::TIMESTAMP, ['nullable'], []);
         }
     }
 

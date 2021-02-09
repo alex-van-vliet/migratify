@@ -7,6 +7,7 @@ namespace AlexVanVliet\Migratify\Tests\Unit\Database;
 use AlexVanVliet\Migratify\Database\BlueprintMock;
 use AlexVanVliet\Migratify\Database\OperationNotSupportedException;
 use AlexVanVliet\Migratify\Fields\Field;
+use AlexVanVliet\Migratify\Fields\ForeignField;
 use AlexVanVliet\Migratify\Tests\TestCase;
 
 class BlueprintMockTest extends TestCase
@@ -47,5 +48,15 @@ class BlueprintMockTest extends TestCase
         $this->mock->removeColumn('column');
 
         $this->assertEquals([], $this->mock->getFields());
+    }
+
+    /** @test */
+    function foreign_id_adds_a_foreign_field()
+    {
+        $this->mock->foreignId('user_id');
+
+        $this->assertEquals([
+            'user_id' => new ForeignField('user_id', ForeignField::BIG_INTEGER, ['autoIncrement' => false, 'unsigned' => true]),
+        ], $this->mock->getFields());
     }
 }

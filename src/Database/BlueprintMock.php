@@ -5,6 +5,7 @@ namespace AlexVanVliet\Migratify\Database;
 
 
 use AlexVanVliet\Migratify\Fields\Field;
+use AlexVanVliet\Migratify\Fields\ForeignField;
 use Closure;
 use Illuminate\Database\Schema\Blueprint;
 
@@ -170,5 +171,20 @@ class BlueprintMock extends Blueprint
     public function nullableUuidMorphs($name, $indexName = null)
     {
         throw new FieldNotSupportedException('nullableUuidMorphs');
+    }
+
+    /**
+     * Create a new unsigned big integer (8-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return ForeignField
+     */
+    public function foreignId($column)
+    {
+        parent::foreignId($column);
+
+        $this->fields[$column] = new ForeignField($column,Field::BIG_INTEGER, ['autoIncrement' => false, 'unsigned' => true]);
+
+        return $this->fields[$column];
     }
 }

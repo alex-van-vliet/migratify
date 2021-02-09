@@ -97,6 +97,8 @@ class Field extends Fluent
     public const MULTI_POLYGON = 'multiPolygon';
     public const MULTI_POLYGON_Z = 'multiPolygonZ';
 
+    public const FOREIGN_ID = 'foreignId';
+
     /**
      * Field constructor.
      *

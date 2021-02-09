@@ -87,7 +87,7 @@ class Model
         foreach ($this->fields as $name => $field) {
             $attributes = $field->getAttributes();
 
-            $reflection = new ReflectionClass(Blueprint::class);
+            $reflection = new ReflectionClass(BlueprintMock::class);
             $method = $reflection->getMethod($field->getType());
             $parameters = $method->getParameters();
             assert(count($parameters) > 0);

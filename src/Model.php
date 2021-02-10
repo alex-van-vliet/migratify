@@ -25,14 +25,20 @@ class Model
     )
     {
         $instantiatedFields = [];
-        if (($this->options['id'] ?? true) === true) {
+        $this->options = array_merge([
+            'id' => true,
+            'timestamps' => true,
+            'soft_deletes' => false,
+        ], $this->options);
+
+        if ($this->options['id']) {
             $instantiatedFields['id'] = new Field(Field::ID, [], ['guarded']);
         }
-        if (($this->options['timestamps'] ?? true) === true) {
+        if ($this->options['timestamps']) {
             $instantiatedFields['created_at'] = new Field(Field::TIMESTAMP, ['nullable'], []);
             $instantiatedFields['updated_at'] = new Field(Field::TIMESTAMP, ['nullable'], []);
         }
-        if (($this->options['soft_deletes'] ?? false) === true) {
+        if ($this->options['soft_deletes']) {
             $instantiatedFields['deleted_at'] = new Field(Field::TIMESTAMP, ['nullable'], []);
         }
 
@@ -72,6 +78,16 @@ class Model
     public function getFields(): array
     {
         return $this->fields;
+    }
+
+    /**
+     * Get all the options.
+     *
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 
     /**

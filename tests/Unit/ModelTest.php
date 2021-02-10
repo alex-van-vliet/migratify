@@ -29,12 +29,30 @@ class ModelTest extends TestCase
     }
 
     /** @test */
+    function id_option_defaults_to_true()
+    {
+        $model = new Model([]);
+
+        $this->assertArrayHasKey('id', $model->getOptions());
+        $this->assertEquals(true, $model->getOptions()['id']);
+    }
+
+    /** @test */
     function id_option_creates_an_id_field()
     {
         $model = new Model([]);
 
         $this->assertArrayHasKey('id', $model->getFields());
         $this->assertEquals(new Field(Field::ID, [], ['guarded']), $model->getFields()['id']);
+    }
+
+    /** @test */
+    function timestamps_option_defaults_to_true()
+    {
+        $model = new Model([]);
+
+        $this->assertArrayHasKey('timestamps', $model->getOptions());
+        $this->assertEquals(true, $model->getOptions()['timestamps']);
     }
 
     /** @test */
@@ -62,6 +80,15 @@ class ModelTest extends TestCase
 
         $this->assertArrayNotHasKey('created_at', $model->getFields());
         $this->assertArrayNotHasKey('updated_at', $model->getFields());
+    }
+
+    /** @test */
+    function soft_deletes_option_defaults_to_false()
+    {
+        $model = new Model([]);
+
+        $this->assertArrayHasKey('soft_deletes', $model->getOptions());
+        $this->assertEquals(false, $model->getOptions()['soft_deletes']);
     }
 
     /** @test */

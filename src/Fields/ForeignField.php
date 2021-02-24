@@ -4,6 +4,8 @@
 namespace AlexVanVliet\Migratify\Fields;
 
 
+use Illuminate\Database\Eloquent\Model;
+
 class ForeignField extends Field
 {
     /**
@@ -20,6 +22,12 @@ class ForeignField extends Field
         array $options = [],
     )
     {
+        if ($model = $options['references_model'] ?? null) {
+            /** @var Model $model */
+            $model = new $model();
+            $attributes['references'] = $model->getKeyName();
+            $attributes['on'] = $model->getTable();
+        }
         parent::__construct($type, $attributes, $options);
     }
 }

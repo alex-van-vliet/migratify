@@ -18,6 +18,15 @@ class ModelTest_FakeModel extends BaseModel
 class ModelTest extends TestCase
 {
     /** @test */
+    function the_model_can_be_set()
+    {
+        $model = new Model([]);
+        $model->setModel(new ModelTest_FakeModel());
+
+        $this->assertEquals(new ModelTest_FakeModel(), $model->getModel());
+    }
+
+    /** @test */
     function the_fields_are_initialized()
     {
         $model = new Model([
@@ -123,7 +132,7 @@ class ModelTest extends TestCase
     {
         $model = Model::from_attribute(ModelTest_FakeModel::class);
 
-        $this->assertEquals(new Model([]), $model);
+        $this->assertEquals((new Model([]))->setModel(new ModelTest_FakeModel()), $model);
     }
 
     /** @test */

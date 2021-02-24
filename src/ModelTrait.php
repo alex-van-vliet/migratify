@@ -17,7 +17,7 @@ trait ModelTrait
      */
     public function initializeModelTrait()
     {
-        $trait = Model::from_attribute(static::class);
+        $trait = Model::from_attribute($this);
 
         if (!empty($this->fillable))
             throw new InvalidBaseConfigurationException(static::class);

@@ -6,6 +6,7 @@ namespace AlexVanVliet\Migratify;
 use AlexVanVliet\Migratify\Database\BlueprintMock;
 use AlexVanVliet\Migratify\Fields\Field;
 use Attribute;
+use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\Schema\Blueprint;
 use ReflectionClass;
 use ReflectionException;
@@ -13,6 +14,11 @@ use ReflectionException;
 #[Attribute]
 class Model
 {
+    /**
+     * @var EloquentModel|null The eloquent model.
+     */
+    protected ?EloquentModel $model;
+
     /**
      * Model constructor.
      *
@@ -63,12 +69,12 @@ class Model
     /**
      * Get the model from the attribute.
      *
-     * @param string $model The model class.
+     * @param string|EloquentModel $model The model class.
      * @return static
      * @throws ModelNotFoundException
      * @throws ReflectionException
      */
-    public static function from_attribute(string $model): self
+    public static function from_attribute(string|EloquentModel $model): self
     {
         $reflectionClass = new ReflectionClass($model);
 
@@ -77,7 +83,12 @@ class Model
             throw new ModelNotFoundException($reflectionClass->getName());
         assert(count($attributes) == 1);
 
-        return $attributes[0]->newInstance();
+        $instance = $attributes[0]->newInstance();
+        if (is_string($model))
+            $instance->setModel(new $model());
+        else
+            $instance->setModel($model);
+        return $instance;
     }
 
     /**
@@ -166,5 +177,23 @@ class Model
             }
         }
         return [$fillable, $guarded];
+    }
+
+    /**
+     * @return EloquentModel|null
+     */
+    public function getModel(): ?EloquentModel
+    {
+        return $this->model;
+    }
+
+    /**
+     * @param EloquentModel|null $model
+     * @return Model
+     */
+    public function setModel(?EloquentModel $model): Model
+    {
+        $this->model = $model;
+        return $this;
     }
 }

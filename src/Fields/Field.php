@@ -4,6 +4,7 @@
 namespace AlexVanVliet\Migratify\Fields;
 
 
+use AlexVanVliet\Migratify\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
 use InvalidArgumentException;
@@ -105,11 +106,13 @@ class Field extends Fluent
      * @param string $type The type of the field.
      * @param array $attributes Its attributes.
      * @param array $options The options.
+     * @param Model|null $model The model.
      */
     public function __construct(
         protected string $type,
         array $attributes = [],
         protected array $options = [],
+        protected ?Model $model = null,
     )
     {
         parent::__construct($attributes);
@@ -271,5 +274,13 @@ class Field extends Fluent
     public function change()
     {
 
+    }
+
+    /**
+     * @return Model|null
+     */
+    public function getModel(): ?Model
+    {
+        return $this->model;
     }
 }

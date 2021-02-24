@@ -5,6 +5,7 @@ namespace AlexVanVliet\Migratify\Tests\Unit\Fields;
 
 
 use AlexVanVliet\Migratify\Fields\Field;
+use AlexVanVliet\Migratify\Model;
 use AlexVanVliet\Migratify\Tests\TestCase;
 use Illuminate\Database\Schema\Blueprint;
 use InvalidArgumentException;
@@ -59,7 +60,8 @@ class FieldTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        escape_value(new class{});
+        escape_value(new class {
+        });
     }
 
     /** @test */
@@ -194,5 +196,14 @@ class FieldTest extends TestCase
         $field2 = new Field(Field::STRING, ['length' => 255], ['my_option']);
 
         $this->assertTrue($field1->equals($field2));
+    }
+
+    /** @test */
+    function its_model_can_be_set()
+    {
+        $model = new Model([]);
+        $field = new Field(Field::STRING, model: $model);
+
+        $this->assertEquals($model, $field->getModel());
     }
 }

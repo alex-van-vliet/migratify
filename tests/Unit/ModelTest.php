@@ -25,7 +25,17 @@ class ModelTest extends TestCase
         ]);
 
         $this->assertArrayHasKey('column', $model->getFields());
-        $this->assertEquals(new Field(Field::TEXT), $model->getFields()['column']);
+        $this->assertEquals(new Field(Field::TEXT, model: $model), $model->getFields()['column']);
+    }
+
+    /** @test */
+    function it_sets_the_model_on_the_fields()
+    {
+        $model = new Model([
+            'column' => [Field::TEXT],
+        ]);
+
+        $this->assertEquals($model, $model->getFields()['column']->getModel());
     }
 
     /** @test */
@@ -43,7 +53,7 @@ class ModelTest extends TestCase
         $model = new Model([]);
 
         $this->assertArrayHasKey('id', $model->getFields());
-        $this->assertEquals(new Field(Field::ID, [], ['guarded']), $model->getFields()['id']);
+        $this->assertEquals(new Field(Field::ID, [], ['guarded'], model: $model), $model->getFields()['id']);
     }
 
     /** @test */
@@ -61,7 +71,7 @@ class ModelTest extends TestCase
         $model = new Model([]);
 
         $this->assertArrayHasKey('created_at', $model->getFields());
-        $this->assertEquals(new Field(Field::TIMESTAMP, ['nullable']), $model->getFields()['created_at']);
+        $this->assertEquals(new Field(Field::TIMESTAMP, ['nullable'], model: $model), $model->getFields()['created_at']);
     }
 
     /** @test */
@@ -70,7 +80,7 @@ class ModelTest extends TestCase
         $model = new Model([]);
 
         $this->assertArrayHasKey('updated_at', $model->getFields());
-        $this->assertEquals(new Field(Field::TIMESTAMP, ['nullable']), $model->getFields()['updated_at']);
+        $this->assertEquals(new Field(Field::TIMESTAMP, ['nullable'], model: $model), $model->getFields()['updated_at']);
     }
 
     /** @test */
@@ -105,7 +115,7 @@ class ModelTest extends TestCase
         $model = new Model([], ['soft_deletes' => true]);
 
         $this->assertArrayHasKey('deleted_at', $model->getFields());
-        $this->assertEquals(new Field(Field::TIMESTAMP, ['nullable']), $model->getFields()['created_at']);
+        $this->assertEquals(new Field(Field::TIMESTAMP, ['nullable'], model: $model), $model->getFields()['created_at']);
     }
 
     /** @test */

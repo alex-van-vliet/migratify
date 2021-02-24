@@ -32,19 +32,29 @@ class Model
         ], $this->options);
 
         if ($this->options['id']) {
-            $instantiatedFields['id'] = new Field(Field::ID, [], ['guarded']);
+            $instantiatedFields['id'] = new Field(Field::ID, [], ['guarded'], model: $this);
         }
         if ($this->options['timestamps']) {
-            $instantiatedFields['created_at'] = new Field(Field::TIMESTAMP, ['nullable'], []);
-            $instantiatedFields['updated_at'] = new Field(Field::TIMESTAMP, ['nullable'], []);
+            $instantiatedFields['created_at'] = new Field(Field::TIMESTAMP, ['nullable'], [], model: $this);
+            $instantiatedFields['updated_at'] = new Field(Field::TIMESTAMP, ['nullable'], [], model: $this);
         }
         if ($this->options['soft_deletes']) {
-            $instantiatedFields['deleted_at'] = new Field(Field::TIMESTAMP, ['nullable'], []);
+            $instantiatedFields['deleted_at'] = new Field(Field::TIMESTAMP, ['nullable'], [], model: $this);
         }
 
         foreach ($this->fields as $name => $field) {
             assert(count($field) === 1 or count($field) === 2 or count($field) === 3);
-            $instantiatedFields[$name] = new Field(...$field);
+            switch (count($field)) {
+                case 1:
+                    $instantiatedFields[$name] = new Field($field[0], model: $this);
+                    break;
+                case 2:
+                    $instantiatedFields[$name] = new Field($field[0], $field[1], model: $this);
+                    break;
+                case 3:
+                    $instantiatedFields[$name] = new Field($field[0], $field[1], $field[2], model: $this);
+                    break;
+            }
         }
 
         $this->fields = $instantiatedFields;
